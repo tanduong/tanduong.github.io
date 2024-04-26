@@ -42,6 +42,7 @@
             <li><span id="seconds">&nbsp;</span>Seconds</li>
           </ul>
         </section>
+        <p>Don't just count the days, make the days count.</p>
       </section>
 
       <section id="svgContainer">
@@ -115,6 +116,10 @@
         font-size: 4.5rem;
       }
 
+      p {
+        margin-top: 2rem;
+      }
+
       .emoji {
         display: none;
         padding: 1rem;
@@ -123,6 +128,12 @@
       .emoji span {
         font-size: 4rem;
         padding: 0 0.5rem;
+      }
+
+      @media all and (max-width: 414px) {
+        li {
+          padding: 0.75em;
+        }
       }
 
       @media all and (max-width: 768px) {
@@ -175,50 +186,62 @@
         const countDown = getFrom() || new Date("June 8, 2049").getTime();
 
         let lastCurrentDays = 0;
+        let lastSeconds = 0;
 
-        setInterval(function () {
+        function render() {
           const distance = countDown - new Date().getTime();
+          const seconds = distance / second;
 
-          const daysBetween = Math.ceil(distance / day);
-          document.title = `${daysBetween} days left`;
+          if (seconds != lastSeconds) {
+            const daysBetween = Math.ceil(distance / day);
+            document.title = `${daysBetween} days left`;
 
-          const currentDays = 10000 - daysBetween;
+            const currentDays = 10000 - daysBetween;
 
-          if (currentDays != lastCurrentDays) {
-            const percentage = (1 - daysBetween / 10000) * 100;
-            document
-              .getElementById("pie")
-              .setAttribute(
-                "stroke-dasharray",
-                `calc(${percentage} * 31.4 / 100) 31.4`
-              );
+            if (currentDays != lastCurrentDays) {
+              const percentage = (1 - daysBetween / 10000) * 100;
+              document
+                .getElementById("pie")
+                .setAttribute(
+                  "stroke-dasharray",
+                  `calc(${percentage} * 31.4 / 100) 31.4`
+                );
 
-            renderCells(10000 - daysBetween);
+              renderCells(10000 - daysBetween);
 
-            lastCurrentDays = currentDays;
+              lastCurrentDays = currentDays;
+            }
+
+            document.getElementById("days").innerText = Math.floor(
+              distance / day
+            );
+
+            document.getElementById("hours").innerText = Math.floor(
+              (distance % day) / hour
+            );
+            document.getElementById("minutes").innerText = Math.floor(
+              (distance % hour) / minute
+            );
+            document.getElementById("seconds").innerText = Math.floor(
+              (distance % minute) / second
+            );
+
+            //do something later when date is reached
+            if (distance < 0) {
+              document.getElementById("headline").innerText = "It's time!";
+              document.getElementById("countdown").style.display = "none";
+              document.getElementById("content").style.display = "block";
+            }
           }
 
-          document.getElementById("days").innerText = Math.floor(
-            distance / day
-          );
+          lastSeconds = seconds;
 
-          document.getElementById("hours").innerText = Math.floor(
-            (distance % day) / hour
-          );
-          document.getElementById("minutes").innerText = Math.floor(
-            (distance % hour) / minute
-          );
-          document.getElementById("seconds").innerText = Math.floor(
-            (distance % minute) / second
-          );
+          setTimeout(() => {
+            window.requestAnimationFrame(render);
+          }, 1000);
+        }
 
-          //do something later when date is reached
-          if (distance < 0) {
-            document.getElementById("headline").innerText = "It's time!";
-            document.getElementById("countdown").style.display = "none";
-            document.getElementById("content").style.display = "block";
-          }
-        }, second);
+        window.requestAnimationFrame(render);
 
         document.addEventListener("DOMContentLoaded", function () {
           const now = new Date();
