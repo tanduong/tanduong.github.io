@@ -11,6 +11,7 @@
   </head>
   <body>
     <main class="container">
+      <div id="toast" class="toast"></div>
       <svg
         aria-label="Progress indicator"
         class="fade-in-animation"
@@ -174,6 +175,50 @@
         max-width: 80vw;
         height: auto;
       }
+
+      /* Toast */
+      .toast {
+        visibility: hidden; /* Hidden by default */
+        min-width: 250px; /* Set a default minimum width */
+        margin-left: -125px; /* Divide value of min-width by 2 */
+        background-color: #333; /* Black background color */
+        color: #fff; /* White text color */
+        text-align: center; /* Centered text */
+        border-radius: 2px; /* Rounded borders */
+        padding: 16px; /* Padding */
+        position: fixed; /* Sit on top of the screen */
+        z-index: 1; /* Add a z-index if needed */
+        left: 50%; /* Center the toast */
+        bottom: 30px; /* 30px from the bottom */
+        font-size: 17px; /* Font size */
+      }
+
+      .toast.show {
+        visibility: visible; /* Show the toast */
+        animation: fadein 0.5s, fadeout 0.5s 2.5s; /* Fade in and then fade out */
+      }
+
+      @keyframes fadein {
+        from {
+          bottom: 0;
+          opacity: 0;
+        }
+        to {
+          bottom: 30px;
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeout {
+        from {
+          bottom: 30px;
+          opacity: 1;
+        }
+        to {
+          bottom: 0;
+          opacity: 0;
+        }
+      }
     </style>
 
     <script>
@@ -275,11 +320,21 @@
             }
 
             message = message.trim().replace(/,$/, "");
-            alert(message + " since your last visit!");
+            showToast(message + " since your last visit!");
           }
 
           localStorage.setItem("last_visit", now.getTime());
         });
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "toast show";
+
+            setTimeout(function(){
+                toast.className = toast.className.replace("show", "");
+            }, 3000);
+        }
 
         function getQueryParam(param) {
           const queryParams = new URLSearchParams(window.location.search);
