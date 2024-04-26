@@ -218,6 +218,44 @@
           }
         }, second);
 
+        document.addEventListener("DOMContentLoaded", function () {
+          const now = new Date();
+          const lastVisit = localStorage.getItem("last_visit");
+
+          if (lastVisit) {
+            const lastVisitDate = new Date(parseInt(lastVisit));
+            const diff = now - lastVisitDate;
+
+            const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(
+              (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
+            const diffMinutes = Math.floor(
+              (diff % (1000 * 60 * 60)) / (1000 * 60)
+            );
+            const diffSeconds = Math.floor((diff % (1000 * 60)) / 1000); // Calculate seconds
+
+            let message = "";
+            if (diffDays > 0) {
+              message += `${diffDays} day${diffDays > 1 ? "s" : ""}, `;
+            }
+            if (diffHours > 0) {
+              message += `${diffHours} hour${diffHours > 1 ? "s" : ""}, `;
+            }
+            if (diffMinutes > 0) {
+              message += `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}, `;
+            }
+            if (diffSeconds > 0 || message === "") {
+              message += `${diffSeconds} second${diffSeconds !== 1 ? "s" : ""}`;
+            }
+
+            message = message.trim().replace(/,$/, "");
+            alert(message + " since your last visit!");
+          }
+
+          localStorage.setItem("last_visit", now.getTime());
+        });
+
         function renderCells(fill) {
           const size = 5; // Size of each square
           const rows = 100;
