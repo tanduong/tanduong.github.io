@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Live countdown to 10,000 days milestone with visual and numeric indicators." />
+    <meta
+      name="description"
+      content="Live countdown to 10,000 days milestone with visual and numeric indicators."
+    />
     <title>10,000 days</title>
   </head>
   <body>
     <main class="container">
-      <h1 class="fade-in-animation" id="headline">Countdown to my 10,000 days</h1>
-      <section class="fade-in-animation" id="countdown" aria-live="polite" aria-atomic="true">
-        <ul>
-          <li><span id="days">&nbsp;</span>Days</li>
-          <li><span id="hours">&nbsp;</span>Hours</li>
-          <li><span id="minutes">&nbsp;</span>Minutes</li>
-          <li><span id="seconds">&nbsp;</span>Seconds</li>
-        </ul>
-      </section>
-      <svg aria-label="Progress indicator" class="fade-in-animation" height="200" width="200" viewBox="0 0 20 20">
+      <svg
+        aria-label="Progress indicator"
+        class="fade-in-animation"
+        height="200"
+        width="200"
+        viewBox="0 0 20 20"
+      >
         <circle r="10" cx="10" cy="10" fill="white" />
         <circle
           id="pie"
@@ -31,6 +31,30 @@
           transform="rotate(-90) translate(-20)"
         />
       </svg>
+
+      <section class="clock fade-in-animation">
+        <h1 id="headline">Countdown to my 10,000 days</h1>
+        <section id="countdown" aria-live="polite" aria-atomic="true">
+          <ul>
+            <li><span id="days">&nbsp;</span>Days</li>
+            <li><span id="hours">&nbsp;</span>Hours</li>
+            <li><span id="minutes">&nbsp;</span>Minutes</li>
+            <li><span id="seconds">&nbsp;</span>Seconds</li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="svgContainer">
+        <svg
+          id="cells"
+          aria-label="Progress indicator"
+          width="500"
+          height="500"
+          viewBox="0 0 500 500"
+        >
+          <rect x="0" y="0" width="500" height="500" fill="#ffd54f9e"></rect>
+        </svg>
+      </section>
       <section id="content" class="emoji" aria-label="Celebration emojis">
         <span>🥳</span>
         <span>🎉</span>
@@ -123,9 +147,19 @@
       }
 
       .fade-in-animation {
-        opacity: 0; 
+        opacity: 0;
         animation: fadeIn 2s ease-in-out forwards;
-        animation-delay: 0.25s; 
+        animation-delay: 0.25s;
+      }
+
+      .clock {
+        margin-top: 4rem;
+        margin-bottom: 4rem;
+      }
+
+      svg {
+        max-width: 80vw;
+        height: auto;
       }
     </style>
 
@@ -138,19 +172,29 @@
 
         const countDown = new Date("June 8, 2049").getTime();
 
+        let lastCurrentDays = 0;
+
         setInterval(function () {
           const distance = countDown - new Date().getTime();
 
           const daysBetween = Math.ceil(distance / day);
           document.title = `${daysBetween} days left`;
 
-          const percentage = (1 - daysBetween / 10000) * 100;
-          document
-            .getElementById("pie")
-            .setAttribute(
-              "stroke-dasharray",
-              `calc(${percentage} * 31.4 / 100) 31.4`
-            );
+          const currentDays = 10000 - daysBetween;
+
+          if (currentDays != lastCurrentDays) {
+            const percentage = (1 - daysBetween / 10000) * 100;
+            document
+              .getElementById("pie")
+              .setAttribute(
+                "stroke-dasharray",
+                `calc(${percentage} * 31.4 / 100) 31.4`
+              );
+
+            renderCells(10000 - daysBetween);
+
+            lastCurrentDays = currentDays;
+          }
 
           document.getElementById("days").innerText = Math.floor(
             distance / day
@@ -173,6 +217,47 @@
             document.getElementById("content").style.display = "block";
           }
         }, second);
+
+        function renderCells(fill) {
+          const size = 5; // Size of each square
+          const rows = 100;
+          const cols = 100;
+          const rowSize = size * cols;
+          const colSize = size * rows;
+
+          const svgNS = "http://www.w3.org/2000/svg";
+          let svg = document.createElementNS(svgNS, "svg");
+          svg.setAttribute("id", "cells");
+          svg.setAttribute("aria-label", "Progress indicator");
+          svg.setAttribute("width", `${rowSize}`);
+          svg.setAttribute("height", `${colSize}`);
+          svg.setAttribute("viewBox", `0 0 ${rowSize} ${colSize}`);
+
+          for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+              let square = document.createElementNS(svgNS, "rect");
+              square.setAttribute("x", j * size);
+              square.setAttribute("y", i * size);
+              square.setAttribute("width", size);
+              square.setAttribute("height", size);
+              if (fill > 0) {
+                square.setAttribute("fill", "tomato");
+                fill -= 1;
+              } else {
+                square.setAttribute("fill", "white");
+              }
+
+              square.setAttribute("stroke", "yellow");
+
+              svg.appendChild(square);
+            }
+          }
+
+          // Append the SVG to the container
+          document
+            .getElementById("svgContainer")
+            .replaceChild(svg, document.getElementById("cells"));
+        }
       })();
     </script>
   </body>
