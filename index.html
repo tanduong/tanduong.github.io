@@ -3,25 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta name="description" content="Live countdown to 10,000 days milestone with visual and numeric indicators." />
+    <title>10,000 days</title>
   </head>
   <body>
-    <div class="container">
-      <h1 id="headline">Countdown to my 10,000 days</h1>
-      <div id="countdown">
+    <main class="container">
+      <h1 class="fade-in-animation" id="headline">Countdown to my 10,000 days</h1>
+      <section class="fade-in-animation" id="countdown" aria-live="polite" aria-atomic="true">
         <ul>
-          <li><span id="days"></span>days</li>
-          <li><span id="hours"></span>Hours</li>
-          <li><span id="minutes"></span>Minutes</li>
-          <li><span id="seconds"></span>Seconds</li>
+          <li><span id="days">&nbsp;</span>Days</li>
+          <li><span id="hours">&nbsp;</span>Hours</li>
+          <li><span id="minutes">&nbsp;</span>Minutes</li>
+          <li><span id="seconds">&nbsp;</span>Seconds</li>
         </ul>
-      </div>
-      <div id="content" class="emoji">
+      </section>
+      <svg aria-label="Progress indicator" class="fade-in-animation" height="200" width="200" viewBox="0 0 20 20">
+        <circle r="10" cx="10" cy="10" fill="white" />
+        <circle
+          id="pie"
+          r="5"
+          cx="10"
+          cy="10"
+          fill="transparent"
+          stroke="tomato"
+          stroke-width="10"
+          stroke-dasharray="calc(1 * 31.4 / 100) 31.4"
+          transform="rotate(-90) translate(-20)"
+        />
+      </svg>
+      <section id="content" class="emoji" aria-label="Celebration emojis">
         <span>🥳</span>
         <span>🎉</span>
         <span>🎂</span>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <style>
       /* general styling */
@@ -97,6 +112,21 @@
           font-size: calc(3.375rem * var(--smaller));
         }
       }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .fade-in-animation {
+        opacity: 0; 
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 0.25s; 
+      }
     </style>
 
     <script>
@@ -109,35 +139,39 @@
         const countDown = new Date("June 8, 2049").getTime();
 
         setInterval(function () {
-            const diffInMilliseconds = countDown - new Date();
-            const daysBetween = Math.ceil(diffInMilliseconds / 86400000);
-            document.title = `${daysBetween} days left`;
-        }, second);
+          const distance = countDown - new Date().getTime();
 
-        
-        setInterval(function () {
-            const distance = countDown - new Date().getTime();
+          const daysBetween = Math.ceil(distance / day);
+          document.title = `${daysBetween} days left`;
 
-            (document.getElementById("days").innerText = Math.floor(
-              distance / day
-            )),
-              (document.getElementById("hours").innerText = Math.floor(
-                (distance % day) / hour
-              )),
-              (document.getElementById("minutes").innerText = Math.floor(
-                (distance % hour) / minute
-              )),
-              (document.getElementById("seconds").innerText = Math.floor(
-                (distance % minute) / second
-              ));
+          const percentage = (1 - daysBetween / 10000) * 100;
+          document
+            .getElementById("pie")
+            .setAttribute(
+              "stroke-dasharray",
+              `calc(${percentage} * 31.4 / 100) 31.4`
+            );
 
-            if (distance < 0) {
-              document.getElementById("headline").innerText =
-                "It's time!";
-              document.getElementById("countdown").style.display = "none";
-              document.getElementById("content").style.display = "block";
-              clearInterval(x);
-            }
+          document.getElementById("days").innerText = Math.floor(
+            distance / day
+          );
+
+          document.getElementById("hours").innerText = Math.floor(
+            (distance % day) / hour
+          );
+          document.getElementById("minutes").innerText = Math.floor(
+            (distance % hour) / minute
+          );
+          document.getElementById("seconds").innerText = Math.floor(
+            (distance % minute) / second
+          );
+
+          //do something later when date is reached
+          if (distance < 0) {
+            document.getElementById("headline").innerText = "It's time!";
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("content").style.display = "block";
+          }
         }, second);
       })();
     </script>
