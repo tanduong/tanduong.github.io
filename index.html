@@ -193,7 +193,7 @@
           const seconds = distance / second;
 
           if (seconds != lastSeconds) {
-            const daysBetween = Math.ceil(distance / day);
+            const daysBetween = Math.floor(distance / day);
             document.title = `${daysBetween} days left`;
 
             const currentDays = 10000 - daysBetween;
