@@ -1,2 +1,2 @@
 convert:
-	jupyter nbconvert --to html --theme dark notebooks/*.ipynb
+	jupyter nbconvert --to html --css notebooks/style.css --theme dark notebooks/*.ipynb
