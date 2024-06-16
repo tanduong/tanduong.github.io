@@ -70,7 +70,8 @@ html {
     color: #eb99a1; }
     a:hover {
       color: #DA4453;
-      border-bottom: 2px solid #d9d8dc; }
+      text-decoration: none;
+      border-bottom: none; }
   
   ul {
     padding-left: 1.4em;

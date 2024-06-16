@@ -14610,23 +14610,8 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura-dark.css" media="screen" />
 <link rel="stylesheet" href="/notebooks/sakura-vader.css" media="screen" />
-<style>
-    :root {
-        --jp-code-font-family-default: 'Fira Code', monospace;
-    }
-
-    body {
-        font-family: 'Montserrat', sans-serif;
-    }
-</style>
 <a href="/">
     <h1>🏠 Back</h1>
 </a>
@@ -14641,14 +14626,15 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Understanding-Bias-in-Estimators">Understanding Bias in Estimators<a class="anchor-link" href="#Understanding-Bias-in-Estimators">&#182;</a></h1><p>Bias in statistics measures the difference between an estimator's expected value and the true parameter value it aims to estimate. It's a key concept for assessing the accuracy of statistical methods. In this post, we'll explore the concept of bias, provide examples of biased and unbiased estimators, and use Python to illustrate these ideas through simulations.</p>
+<h1 id="Understanding-Bias-in-Estimators">Understanding Bias in Estimators<a class="anchor-link" href="#Understanding-Bias-in-Estimators">&#182;</a></h1><p><a href="https://colab.research.google.com/github/tanduong/tanduong.github.io/blob/main/notebooks/bias.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" /></a></p>
+<p>Bias in statistics measures the difference between an estimator's expected value and the true parameter value it aims to estimate. It's a key concept for assessing the accuracy of statistical methods. In this post, we'll explore the concept of bias, provide examples of biased and unbiased estimators, and use Python to illustrate these ideas through simulations.</p>
 <hr />
 <h2 id="Definition">Definition<a class="anchor-link" href="#Definition">&#182;</a></h2><p>The bias of an estimator is defined as:
 $$
 \text{bias}(\hat{\theta}_m) = E(\hat{\theta}_m) - \theta
 $$</p>
 <p>Let's go on to give some examples of the bias of an estimator.</p>
-<h3 id="Example-1:-Sample-Mean-as-an-Estimator-of-Population-Mean">Example 1: Sample Mean as an Estimator of Population Mean<a class="anchor-link" href="#Example-1:-Sample-Mean-as-an-Estimator-of-Population-Mean">&#182;</a></h3><p>Consider the sample mean $\bar{X}$ as an estimator of the population mean $\mu$.</p>
+<h2 id="Examples">Examples<a class="anchor-link" href="#Examples">&#182;</a></h2><h3 id="Example-1:-Sample-Mean-as-an-Estimator-of-Population-Mean">Example 1: Sample Mean as an Estimator of Population Mean<a class="anchor-link" href="#Example-1:-Sample-Mean-as-an-Estimator-of-Population-Mean">&#182;</a></h3><p>Consider the sample mean $\bar{X}$ as an estimator of the population mean $\mu$.</p>
 <p><strong>Estimator:</strong>
 $$
 \hat{\theta}_m = \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i
@@ -14691,7 +14677,7 @@ $$
 $$</p>
 <p>However, for asymmetric distributions, the sample median can be biased.</p>
 <p>These examples illustrate how the bias of an estimator can vary depending on the estimator and the parameter being estimated.</p>
-<h3 id="Illustrating-Bias-with-Python">Illustrating Bias with Python<a class="anchor-link" href="#Illustrating-Bias-with-Python">&#182;</a></h3><p>Let's write some Python code to illustrate the bias of different estimators. We'll use simulations to demonstrate the bias of the sample mean and the sample variance.</p>
+<h2 id="Illustrating-Bias-with-Python">Illustrating Bias with Python<a class="anchor-link" href="#Illustrating-Bias-with-Python">&#182;</a></h2><p>Let's write some Python code to illustrate the bias of different estimators. We'll use simulations to demonstrate the bias of the sample mean and the sample variance.</p>
 
 </div>
 </div>
@@ -14785,6 +14771,17 @@ Bias of Sample Variance: -0.6885363027434757
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>This code generates a large population of data from a normal distribution with a specified mean and variance. It then takes many samples from this population, calculates the sample mean and sample variance for each sample, and computes the average bias of these estimators.</p>
 <p>In this example, the bias of the sample mean is close to zero, indicating that the sample mean is an unbiased estimator of the population mean. However, the sample variance is biased, as shown by the negative bias value, which aligns with our theoretical understanding that the sample variance is a biased estimator of the population variance.</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 
 </div>
 </div>
