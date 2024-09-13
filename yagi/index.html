@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Search App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .filter-button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .filter-button:hover {
+            background-color: #0056b3;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none; /* Hidden by default */
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #007BFF;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Donation Search App</h1>
+    <div id="filters" class="filters">
+        <input type="number" id="minAmount" placeholder="Min Amount" class="filter-input">
+        <input type="number" id="maxAmount" placeholder="Max Amount" class="filter-input">
+        <input type="date" id="startDate" class="filter-input">
+        <input type="date" id="endDate" class="filter-input">
+        <input type="text" id="search" placeholder="Search Details..." class="filter-input">
+        <button id="filterButton" class="filter-button">Filter</button>
+    </div>
+    <div class="loading-spinner" id="loadingSpinner"></div> <!-- Loading spinner -->
+    <div class="table-container">
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Page</th>
+                    <th>Doc</th>
+                    <th>Amount</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination" id="paginationControls">
+        <button id="prevPage" disabled>Previous</button>
+        <button id="nextPage">Next</button>
+    </div>
+
+    <script>
+        function formatVND(number) {
+            if (isNaN(number)) return ''; // Return an empty string if the input is not a valid number
+        
+            // Convert the number to a string with commas as thousand separators
+            const formattedNumber = number.toLocaleString('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        
+            return formattedNumber;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let transactions = [];
+            let filteredResults = [];
+            let currentPage = 1;
+            const rowsPerPage = 100;  // Set to render 100 per page
+
+            // Function to load multiple JSON files and merge them into one array
+            async function preloadAndMergeData() {
+                showLoading(true);
+                const filePromises = [];
+                for (let i = 1; i <= 6; i++) {
+                    filePromises.push(fetch(`data_${i}.json`).then(response => response.json()));
+                }
+
+                try {
+                    const dataArrays = await Promise.all(filePromises);
+                    transactions = dataArrays.flat().map(transaction => ({
+                        ...transaction,
+                        trigrams: generateTrigrams(transaction.Details.toLowerCase()) // Pre-compute trigrams
+                    })).sort((a, b) => b.Amount - a.Amount);
+                    filteredResults = transactions;
+                    window.transactions = transactions; // Expose transactions to the console
+                    renderTable(filteredResults, currentPage);
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            preloadAndMergeData(); // Preload all data files
+
+            function renderTable(data, page) {
+                const tableBody = document.getElementById('resultsBody');
+                tableBody.innerHTML = ''; // Clear previous results
+
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedData = data.slice(start, end);
+
+                paginatedData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.Date}</td>
+                        <td>${row.Page}</td>
+                        <td>${row.Doc}</td>
+                        <td>${formatVND(row.Amount)}</td>
+                        <td>${row.Details}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                updatePaginationControls(data.length, page);
+            }
+
+            function updatePaginationControls(totalRows, page) {
+                const prevButton = document.getElementById('prevPage');
+                const nextButton = document.getElementById('nextPage');
+
+                prevButton.disabled = page === 1;
+                nextButton.disabled = page * rowsPerPage >= totalRows;
+            }
+
+            document.getElementById('prevPage').addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable(filteredResults, currentPage);
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', function () {
+                if (currentPage * rowsPerPage < filteredResults.length) {
+                    currentPage++;
+                    renderTable(filteredResults, currentPage);
+                }
+            });
+
+            document.getElementById('filterButton').addEventListener('click', function () {
+                showLoading(true);  // Show loading before starting the search
+                filterResults();
+            });
+
+            // Submit on Enter key
+            document.querySelectorAll('.filter-input').forEach(input => {
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        showLoading(true);  // Show loading when pressing Enter
+                        filterResults();
+                    }
+                });
+            });
+
+            function filterResults() {
+                const searchText = document.getElementById('search').value.trim().toLowerCase();
+                const minAmount = parseFloat(document.getElementById('minAmount').value);
+                const maxAmount = parseFloat(document.getElementById('maxAmount').value);
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                filteredResults = transactions; // Reset to all data
+
+                // Efficient Trigram search if there is a search term
+                if (searchText) {
+                    const searchTrigrams = generateTrigrams(searchText);
+                    filteredResults = filteredResults.map(row => {
+                        return {
+                            ...row,
+                            similarity: calculateSimilarity(searchTrigrams, row.trigrams)
+                        };
+                    }).filter(row => row.similarity > 0)
+                      .sort((a, b) => b.similarity - a.similarity);
+                }
+
+                // Filter by amount
+                if (!isNaN(minAmount) || !isNaN(maxAmount)) {
+                    filteredResults = filteredResults.filter(row => {
+                        const amount = parseFloat(row.Amount.replace(/\./g, ''));
+                        return (isNaN(minAmount) || amount >= minAmount) &&
+                               (isNaN(maxAmount) || amount <= maxAmount);
+                    });
+                }
+
+                // Filter by date
+                if (startDate || endDate) {
+                    filteredResults = filteredResults.filter(row => {
+                        const date = new Date(row.Date.split('/').reverse().join('-')); // Convert to Date object
+                        return (!startDate || date >= new Date(startDate)) &&
+                               (!endDate || date <= new Date(endDate));
+                    });
+                }
+
+                currentPage = 1; // Reset to the first page
+                renderTable(filteredResults, currentPage);
+                showLoading(false);  // Hide loading after the search is complete
+            }
+
+            function generateTrigrams(text) {
+                const trigrams = [];
+                for (let i = 0; i < text.length - 2; i++) {
+                    trigrams.push(text.substring(i, i + 3));
+                }
+                return trigrams;
+            }
+
+            function calculateSimilarity(trigrams1, trigrams2) {
+                const intersection = trigrams1.filter(trigram => trigrams2.includes(trigram));
+                const union = new Set([...trigrams1, ...trigrams2]);
+                return intersection.length / union.size;
+            }
+
+            function showLoading(isLoading) {
+                const spinner = document.getElementById('loadingSpinner');
+                spinner.style.display = isLoading ? 'block' : 'none';
+            }
+
+            function debounce(func, delay) {
+                let debounceTimer;
+                return function () {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+        });
+    </script>
+</body>
+</html>
