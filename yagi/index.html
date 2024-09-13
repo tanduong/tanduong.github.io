@@ -114,10 +114,10 @@
 <body>
     <h1>Donation Search App</h1>
     <div id="filters" class="filters">
-        <input type="number" id="minAmount" placeholder="Min Amount" class="filter-input">
+        <!--input type="number" id="minAmount" placeholder="Min Amount" class="filter-input">
         <input type="number" id="maxAmount" placeholder="Max Amount" class="filter-input">
         <input type="date" id="startDate" class="filter-input">
-        <input type="date" id="endDate" class="filter-input">
+        <input type="date" id="endDate" class="filter-input" -->
         <input type="text" id="search" placeholder="Search Details..." class="filter-input">
         <button id="filterButton" class="filter-button">Filter</button>
     </div>
@@ -251,10 +251,10 @@
 
             function filterResults() {
                 const searchText = document.getElementById('search').value.trim().toLowerCase();
-                const minAmount = parseFloat(document.getElementById('minAmount').value);
-                const maxAmount = parseFloat(document.getElementById('maxAmount').value);
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
+                // const minAmount = parseInt(document.getElementById('minAmount').value);
+                // const maxAmount = parseInt(document.getElementById('maxAmount').value);
+                // const startDate = document.getElementById('startDate').value;
+                // const endDate = document.getElementById('endDate').value;
 
                 filteredResults = transactions; // Reset to all data
 
@@ -270,23 +270,23 @@
                       .sort((a, b) => b.similarity - a.similarity);
                 }
 
-                // Filter by amount
-                if (!isNaN(minAmount) || !isNaN(maxAmount)) {
-                    filteredResults = filteredResults.filter(row => {
-                        const amount = parseFloat(row.Amount.replace(/\./g, ''));
-                        return (isNaN(minAmount) || amount >= minAmount) &&
-                               (isNaN(maxAmount) || amount <= maxAmount);
-                    });
-                }
+                // // Filter by amount
+                // if (!isNaN(minAmount) || !isNaN(maxAmount)) {
+                //     filteredResults = filteredResults.filter(row => {
+                //         const amount = parseFloat(row.Amount.replace(/\./g, ''));
+                //         return (isNaN(minAmount) || amount >= minAmount) &&
+                //                (isNaN(maxAmount) || amount <= maxAmount);
+                //     });
+                // }
 
-                // Filter by date
-                if (startDate || endDate) {
-                    filteredResults = filteredResults.filter(row => {
-                        const date = new Date(row.Date.split('/').reverse().join('-')); // Convert to Date object
-                        return (!startDate || date >= new Date(startDate)) &&
-                               (!endDate || date <= new Date(endDate));
-                    });
-                }
+                // // Filter by date
+                // if (startDate || endDate) {
+                //     filteredResults = filteredResults.filter(row => {
+                //         const date = new Date(row.Date.split('/').reverse().join('-')); // Convert to Date object
+                //         return (!startDate || date >= new Date(startDate)) &&
+                //                (!endDate || date <= new Date(endDate));
+                //     });
+                // }
 
                 currentPage = 1; // Reset to the first page
                 renderTable(filteredResults, currentPage);
